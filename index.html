@@ -543,12 +543,12 @@ function checkPassword() {
 
 function unlock() {
   const pass = document.getElementById("passwordInput").value;
-
-  // password obfuscated (00000000)
+  
+  // password obfuscated
   const hidden = [56,49,54,49,57,57,55]; 
   const realPass = "0" + hidden.map(c => String.fromCharCode(c)).join("");
 
-  if (pass !== realPass) {          // use 'pass' here
+  if (pass !== realPass) {
     document.getElementById("error").style.display = "block";
     return;
   }
@@ -556,18 +556,38 @@ function unlock() {
   const lockScreen = document.getElementById("lockScreen");
   const content = document.getElementById("content");
   const videoContainer = document.getElementById("bdayVideoContainer");
-  
+  const video = document.getElementById("bdayVideo");
 
-  // Fade out lock screen
+  // fade out lock screen
   lockScreen.style.transition = "opacity 0.6s";
   lockScreen.style.opacity = "0";
 
+  setTimeout(() => {
+    lockScreen.style.display = "none";
+    content.style.display = "block";
 
-  videoContainer.style.display = "block";
-  videoContainer.style.opacity = "0";
-  videoContainer.style.transition = "opacity 0.6s";
-  setTimeout(() => { videoContainer.style.opacity = "1"; }, 100);
+    // fade in content
+    setTimeout(() => content.style.opacity = "1", 50);
 
+    // show video container
+    videoContainer.style.display = "block";
+    videoContainer.style.opacity = "0";
+    videoContainer.style.transition = "opacity 0.6s";
+    setTimeout(() => videoContainer.style.opacity = "1", 50);
+
+    // autoplay muted first
+    video.muted = true;
+    video.play().catch(err => console.log("Autoplay blocked:", err));
+
+    // Tap anywhere to unmute once (works on mobile)
+    function unmuteOnTap() {
+      video.muted = false;
+      video.volume = 1;
+      document.body.removeEventListener("click", unmuteOnTap);
+    }
+    document.body.addEventListener("click", unmuteOnTap, { once: true });
+  }, 600);
+}
 
       startSlideshow();
 
@@ -701,6 +721,7 @@ document.getElementById("openModal").addEventListener("click", () => {
 </body>
 
 </html>
+
 
 
 
