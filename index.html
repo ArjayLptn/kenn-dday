@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chasing Fire</title>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<style>
+body.locked {
+  overflow: ;   /*disable scrolling*/
+}
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  color: #fff;
+  position: relative;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url("flwr.jpg") no-repeat center center;
+  background-size: cover;
+  filter: blur(2px) brightness(0.7); 
+  z-index: -1; 
+  pointer-events: none;       /*ensures no click blocking */
+}
+#lockScreen {
+  position: relative;
+  height: 100vh; /* full screen height */
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* centers inputs vertically */
+  align-items: center;
+  text-align: center;
+}
+
+/* Make lockbox responsive */
+#lockBox {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+  width: 90%;           /* instead of fixed */
+  max-width: 400px;     /* cap for big screens */
+}
+#lockBox h2 {
+  margin-bottom: 15px;
+}
+#passwordInput {
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  font-size: 1em;
+  margin: 10px 0;
+  text-align: center;
+  width: 100%;          /* take full width on mobile */
+  max-width: 300px;
+  box-sizing: border-box;
+}
+#unlockBtn {
+  margin-top: 10px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  background-color: rgba(128, 0, 0, 100);
+  color: white;
+  cursor: pointer;
+  width: 100%;          /* take full width on mobile */
+  max-width: 300px;
+  box-sizing: border-box;
+}
+
+#error {
+  color: #ffcccc;
+  margin-top: 8px;
+  display: none;
+}
+
+
+/* Content */
+#content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;      /* center horizontally */
+  justify-content: flex-start;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  padding-bottom: 20px;
+  text-align: center;       /* makes text/messages centered */
+}
+
+video {
+  width: 90%;
+  max-width: 700px;
+  border-radius: 15px;
+  margin: 20px 0;
+  box-shadow: 0 0 15px rgba(0,0,0,0.6);
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+#bdayVideo {
+  display: none;
+}
+
+/* Slideshow wrapper */
+.slideshow {
+  display: flex;
+  justify-content: center;    /* center horizontally */
+  align-items: flex-start;
+  flex-wrap: wrap;            /* allow wrapping into rows */
+  gap: 20px;                  /* space between columns */
+  margin: 20px auto;
+  max-width: 900px;           /* keep it neat */
+}
+
+/* Each column (fading stack) */
+.slide {
+  position: relative;
+  width: clamp(240px, 40vw, 350px);  /* responsive but bounded */
+  aspect-ratio: 3 / 4;               /* fixes height automatically */
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+}
+
+/* Images inside each stack */
+.slide img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+}
+
+/* Visible image */
+.slide img.active { opacity: 1; }
+
+/* Message */
+#message {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.6s ease, opacity 0.6s ease;
+  margin: 10px;
+  font-size: 1em;
+  line-height: 1.5em;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  border-radius: 5px;
+  text-align: justify;
+}
+
+/* When message is open */
+#message.open {
+  max-height: 1000px;   /* big enough to fit content */
+  opacity: 1;
+  padding: 10px 20px;
+}
+
+/* Button / Tab */
+#messageTab {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: rgba(128, 0, 0, 100);
+  color: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s;
+  text-align: center;
+}
+#messageTab:hover {
+  background: #ff4444;
+}
+
+#pageFooter {
+  position: fixed;
+  bottom: 10px;
+  width: 100%;
+  text-align: center;
+  color: #aaa;
+  font-size: 12px;
+}
+
+/* Link styling */
+.message-link {
+  text-align: center;
+  margin: 20px 0;
+}
+.message-link a {
+  color: #ffcc00;
+  font-weight: bold;
+  text-decoration: none;
+  cursor: pointer;
+}
+.message-link a:hover {
+  text-decoration: underline;
+}
+
+/* Modal background */
+.modal {
+  display: none; 
+  position: fixed;
+  z-index: 9999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.7);
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+.modal.show {
+  display: flex;
+  opacity: 1;
+}
+
+.modal.hide {
+  opacity: 0;
+}
+
+/* Modal content */
+.modal-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  position: relative;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+  animation: fadeIn 0.3s ease;
+  text-align: center;
+}
+.modal-content img {
+  width: 100%;
+  border-radius: 12px;
+}
+
+/* Close button */
+.close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 28px;
+  font-weight: bold;
+  color: #333;
+  cursor: pointer;
+}
+.close:hover {
+  color: red;
+}
+
+/* Fade animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .slideshow {
+    flex-direction: column;   /* stack rows */
+    align-items: center;
+  }
+  .slide {
+    width: 90%;               /* fill most of screen width */
+    max-width: 320px;         /* but not too big */
+  }
+}
+.balloon {
+  position: fixed;
+  bottom: -120px;
+  width: 60px;
+  height: 80px;
+  background: radial-gradient(circle at 30% 30%, #ff6b81, #ff4757);
+  border-radius: 50% 50% 50% 50%;
+  animation: floatUp 6s linear forwards;
+  z-index: 9999;
+}
+
+@keyframes floatUp {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(-110vh); opacity: 0; }
+}
+.floating-heart {
+  position: fixed;
+  bottom: 0;
+  font-size: 24px;
+  animation: riseUp linear forwards;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+@keyframes riseUp {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(-100vh); opacity: 0; }
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-3px); }
+  40% { transform: translateX(3px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(3px); }
+}
+
+#messageTab.shake {
+  animation: shake 0.5s;
+}
+#gifModal .floating-emoji {
+  position: absolute;
+  bottom: 10px; /* start inside modal bottom */
+  animation: floatUp 4s ease-in forwards;
+  pointer-events: none;
+}
+
+@keyframes floatUp {
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  50% { transform: translateY(-50vh) scale(1.3); opacity: 0.9; }
+  100% { transform: translateY(-100vh) scale(0.8); opacity: 0; }
+}
+.gallery-wrapper {
+  position: relative;
+  overflow: hidden; /* keeps marquee inside */
+}
+
+.marquee-bg {
+  position: absolute;
+  top: 40%;
+  left: 0;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  font-size: 2rem;
+  font-weight: bold;
+  opacity: 0.5; /* subtle behind effect */
+  animation: marquee 8s linear infinite;
+}
+
+.marquee-bg span {
+  display: inline-block;
+  padding-right: 50px;
+}
+
+@keyframes marquee {
+  0%   { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
+.gallery {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  z-index: 1; /* ensures it's above marquee */
+}
+.gif-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.surprise-img {
+  width: 100%;
+  border-radius: 12px;
+}
+
+.surprise-message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: white;
+  text-shadow: 2px 2px 6px rgba(0,0,0,0.8);
+  text-align: center;
+  white-space: nowrap; /* Prevents weird wrapping before centering */
+  opacity: 0;
+  animation: fadeIn 1.5s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+</style>
+</head>
+
+<body>
+  <!-- Lock Screen -->
+  <div id="lockScreen">
+    <div id="lockBox">
+      <h2>ENTER PASSWORD</h2>
+      <input type="password" id="passwordInput" placeholder="Your 8 digits birthdate">
+      <br><i>wear earphones tenkyo :> </i><br><br>
+      <button id="unlockBtn" onclick="unlock()"><b>UNLOCK</b></button>
+      <div id="error"><i>Wrong password</i></div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div id="content">
+    
+
+<div class="gallery-wrapper">
+  <div class="marquee-bg">
+    <span>💖 Happy Birthday 💖 You're Special 💖 Happy Birthday</span>
+    <span>💖 Happy Birthday 💖 You're Special 💖 Happy Birthday</span>
+  </div>
+   <!-- Slideshow -->
+<div class="slideshow">
+  <div class="slide">
+    <img src="506435540_2420174051685592_4757265308772669572_n.jpg" class="active">
+    <img src="494625851_2382943575408640_5228932212260114853_n.jpg">
+    <img src="481289664_2330183864017945_938278296577919621_n.jpg">
+    <img src="473896177_2295040024198996_251147303708377755_n.jpg">
+    <img src="485770004_2345937762442555_4009250750285579272_n.jpg">
+    <img src="486244450_2345937492442582_6231987000543063133_n.jpg">
+    <img src="483798591_2340648759638122_6619314264299853109_n.jpg">
+    <img src="480702441_2319561321746866_837965574855685271_n.jpg">
+    <img src="473831047_2296532787383053_6335252790635403600_n.jpg">
+    <img src="485894931_2346632912373040_6470507713046637265_n.jpg">
+    <img src="PSX_20250825_030516.jpg">
+    <img src="PSX_20250825_025933.jpg">
+  </div>
+</div>
+</div>
+<br>
+<!-- Message -->
+<div id="messageTab">📩 Read Message</div>
+  <div id="message"><br>
+  🎂Belated pu kennu! You deserve all the happiness and blessings budds.. I hope this coming days brings u closer to ur dreams and gives u more reasons to celebrate lifee🥳.. dami pa namang chances at opportunities ahead and I know kaya mo ring makuha lahat.. 'kaw pa bA?!💪 AHAHHAH (<i>sana ako rin eheh syempre kakayanin ko rin pra sa'tin jok lang buddsHAHAHAH</i>).. dunno y I make this kind of effort ma magcode ngayon hmmm.. pumasok kse ata sa isip ko na baka 'di na kita makikita ulit lala magoverthink noH?🥹 pasensya hehe wat if makahanap ka nga ng bago?🧐hmmm let me know if meron man.. wla lang good to know if mas masaya kA don(<i>'WAG HHAHHAH biro lang</i>).. swerte lang nila kasi mauunahan ako🙄bastA eto muna HAHAHHAH.. natatawa parin ako napansin mo ung number sa UI 'kala ko nde mo papansinin ung mismong code haypp kaAHHAHHAH.. actually ngayon lang ako gumawa ng program na gan'to takes time pero napadali kse special ehehh.. this site can be a good memory that we met lol😛.. tho this won't be deleted anyways andto na 'to.. sguro way ko narin 'to as simpleng bawi sa'yo ng onti🤏 at maramdaman mo na naappreciate din kita oums.. alam mo nman sgurong Im not financially stable.. so wla lang, as pagiging praktikal lang nman.. kaya 'di kita masabayan sa gusto na'ting mangyari.. depende parin nman ATA? bhala na.. malayo pa ako nito but still trying my best to keep up nman.. keep being genuine budds🫶 wag laging seryoso enjoy parinn buhAi aH.. lifes better when u keep that kulit side alive.. kahit 'di sang-ayon panahon sa mga plano.. anyways u’ve got a special spot in my heart kyuttie🥰.. masaya akong nakilala kita.. ill cherish those moments witchu oums😊.. ingatt ka palagi budds 'til nexttime??😚 <br><b><i>—arjay❤</i></b> <!-- Link to open modal -->
+    <div class="message-link">
+      <a href="#" id="openModal"><b>🎁 'WAG MO 'TO PIPINDUTIN SINASABE KO!!! 🫣</b><br><br>
+      <img src="pointmem.png" width="150px" height="150px">
+      <img src="catto.png" width="150px" height="150px"><br><br></a>
+    </div>
+  </div>
+</div>
+
+
+<!-- Video -->
+    <video id="bdayVideo" controls loop>
+      <source src="Palagi - Tj Monterde.mp4" width="640" height="480" allow="autoplay">
+      Your browser does not support video.
+    </video>
+
+<!-- Modal structure -->
+<div id="gifModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <!-- Your surprise GIF or image -->
+    <img src="6a070106efe6.jpg"  alt="Surprise JPG">
+    <img src="ohmnanon.gif" height="400px" width="50%"alt="Surprise GIF" class="surprise-img">
+    <!-- Centered message -->
+    <p class="surprise-message">KULETT KA BUDDS AHHH<br>KISS KA SA'KEN NGAYON😝</p>
+  
+  </div>
+</div>
+
+<!-- Footer -->
+<footer id="pageFooter">
+  © 2025 ArjayTL082525. All rights reserved.
+</footer>
+</div>
+
+<script>
+document.body.classList.add("locked");
+
+function checkPassword() {
+  const input = document.getElementById("passwordInput").value;
+  if (input === "08161997") {
+    document.getElementById("lockScreen").style.display = "none";
+    document.getElementById("content").style.opacity = 1;
+    document.body.classList.remove("locked"); // re-enable scroll when unlocked
+  } else {
+    alert("Incorrect password");
+  }
+}
+
+function unlock() {
+  const pass = document.getElementById("passwordInput").value;
+
+  // password obfuscated (00000000)
+  const hidden = [56,49,54,49,57,57,55]; 
+  const realPass = "0" + hidden.map(c => String.fromCharCode(c)).join("");
+
+  if (pass === realPass) {
+    document.getElementById("lockScreen").style.opacity = "0";
+    setTimeout(() => {
+      document.getElementById("lockScreen").style.display = "none";
+      const content = document.getElementById("content");
+      content.style.display = "block";
+      setTimeout(() => { content.style.opacity = "1"; }, 100);
+
+      // Play video with sound
+      const video = document.getElementById("bdayVideo");
+      video.style.display = "block";
+      video.muted = false;
+      video.play().catch(err => console.log("Video play blocked:", err));
+
+
+      startSlideshow();
+
+      // 🎉 Confetti burst (moved here)
+      confetti({
+        particleCount: 150,
+        spread: 100,
+        origin: { y: 0.6 }
+      });
+
+      // 🎈 Balloons (moved here)
+      for (let i = 0; i < 6; i++) {
+        let balloon = document.createElement("div");
+        balloon.className = "balloon";
+        document.body.appendChild(balloon);
+
+        balloon.style.left = Math.random() * 100 + "vw";
+        balloon.style.animationDelay = Math.random() * 2 + "s";
+
+        setTimeout(() => balloon.remove(), 6000);
+      }
+    }, 600);
+  } else {
+    document.getElementById("error").style.display = "block";
+  }
+}
+
+function startSlideshow() {
+  document.querySelectorAll('.slide').forEach(slide => {
+    const imgs = slide.querySelectorAll('img');
+    let i = 0;
+    setInterval(() => {
+      imgs[i].classList.remove('active');
+      i = (i + 1) % imgs.length;
+      imgs[i].classList.add('active');
+    }, 5000); // 6s per change
+  });
+}
+
+// Allow Enter key to unlock
+document.getElementById("passwordInput").addEventListener("keypress", function(e) {
+  if (e.key === "Enter") unlock();
+});
+
+// Modal functionality
+const modal = document.getElementById("gifModal");
+const openModal = document.getElementById("openModal");
+const closeModal = document.querySelector(".close");
+let autoCloseTimer;
+
+// Open modal
+openModal.onclick = function(e) {
+  e.preventDefault();
+  modal.style.display = "flex";
+  setTimeout(() => modal.classList.add("show"), 10);
+
+  clearTimeout(autoCloseTimer);
+  autoCloseTimer = setTimeout(() => closeWithFade(), 9000);
+};
+
+// Close button
+closeModal.onclick = function() {
+  clearTimeout(autoCloseTimer);
+  closeWithFade();
+};
+
+window.onclick = function(event) {
+  if (event.target === modal) {
+    modal.style.display = "none";
+    clearTimeout(autoCloseTimer);
+  }
+}
+
+function closeWithFade() {
+  modal.classList.remove("show");
+  modal.classList.add("hide");
+
+  setTimeout(() => {
+    modal.style.display = "none";
+    modal.classList.remove("hide");
+  }, 600); // matches transition duration
+}
+// Smooth scroll + toggle message
+document.getElementById("messageTab").addEventListener("click", () => {
+  const msg = document.getElementById("message");
+  msg.classList.toggle("open");
+  msg.scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
+// Floating hearts on tab click
+document.getElementById("messageTab").addEventListener("click", () => {
+  for (let i = 0; i < 10; i++) {
+    let heart = document.createElement("div");
+    heart.className = "floating-heart";
+    heart.innerHTML = "❤️";
+    document.body.appendChild(heart);
+
+    heart.style.left = Math.random() * 100 + "vw";
+    heart.style.animationDuration = (2 + Math.random() * 2) + "s";
+
+    setTimeout(() => heart.remove(), 4000);
+  }
+});
+
+// Shake message tab
+setInterval(() => {
+  let tab = document.getElementById("messageTab");
+  tab.classList.add("shake");
+  setTimeout(() => tab.classList.remove("shake"), 500);
+}, 3000);
+
+// 🎉 Surprise button emoji burst (inside modal)
+document.getElementById("openModal").addEventListener("click", () => {
+  const emojis = ["😛", "😚", "🥰", "🔥", "❤", "🎉", "💕", "✨"];
+  const modal = document.getElementById("gifModal");
+
+  for (let i = 0; i < 15; i++) {
+    let emoji = document.createElement("div");
+    emoji.className = "floating-emoji";
+    emoji.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
+    modal.appendChild(emoji);
+
+    emoji.style.left = Math.random() * 80 + "%"; // keep inside modal
+    emoji.style.fontSize = (20 + Math.random() * 30) + "px";
+    emoji.style.animationDuration = (2 + Math.random() * 2) + "s";
+
+    setTimeout(() => emoji.remove(), 6000);
+  }
+});
+</script>
+</body>
+</html>
