@@ -32,15 +32,13 @@ body::before {
   pointer-events: none;       /*ensures no click blocking */
 }
 #lockScreen {
-  position: fixed; /* stay above content */
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 9999;  /* higher than any video */
+  position: relative;
+  height: 100vh; /* full screen height */
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  justify-content: center; /* centers inputs vertically */
   align-items: center;
+  text-align: center;
 }
 
 /* Make lockbox responsive */
@@ -457,12 +455,11 @@ video {
 
 <!-- Video -->
     <div id="bdayVideoContainer" style="display:none; margin:20px auto; max-width:1144px;">
-  <iframe id="bdayVideoIframe" width="100%" height="480" 
-    src="https://www.youtube.com/embed/-pz8RfOWS18?list=RD-pz8RfOWS18&autoplay=1&loop=1&playlist=-pz8RfOWS18" 
-    title="PALAGI - TJ Monterde | OFFICIAL LYRIC VIDEO" 
-    frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-    allowfullscreen>
-  </iframe>
+ <iframe id="ytVideo" width="1144" height="480"
+  src="https://www.youtube.com/embed/-pz8RfOWS18?autoplay=1&loop=1&playlist=-pz8RfOWS18"
+  frameborder="0" allow="autoplay; encrypted-media" allowfullscreen
+  style="display:none;">
+</iframe>
 </div>
 
 <!-- Modal structure -->
@@ -514,8 +511,9 @@ function unlock() {
       setTimeout(() => { content.style.opacity = "1"; }, 100);
 
       // Show YouTube iframe after unlock
-      const videoContainer = document.getElementById("bdayVideoContainer");
-      videoContainer.style.display = "block";
+      const yt = document.getElementById("ytVideo");
+      yt.style.display = "block";  // only show after unlock
+
 
 
       startSlideshow();
@@ -650,6 +648,7 @@ document.getElementById("openModal").addEventListener("click", () => {
 </body>
 
 </html>
+
 
 
 
