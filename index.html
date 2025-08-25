@@ -557,8 +557,52 @@ function unlock() {
     videoContainer.style.opacity = "0";
     videoContainer.style.transition = "opacity 0.6s";
     setTimeout(() => videoContainer.style.opacity = "1", 100);
+
+    // Start YouTube video after unlock
+    if (typeof YT !== "undefined" && YT.Player) {
+      startYTVideo();
+    }
   }, 600);
 }
+
+// YouTube player setup
+let player;
+function startYTVideo() {
+  if (!player) {
+    player = new YT.Player('player', {
+      height: '360',
+      width: '640',
+      videoId: '-pz8RfOWS18',
+      playerVars: {
+        autoplay: 1,
+        controls: 0,
+        loop: 1,
+        playlist: '-pz8RfOWS18',
+        modestbranding: 1,
+        mute: 1
+      },
+      events: {
+        onReady: onPlayerReady
+      }
+    });
+  } else {
+    player.playVideo();
+  }
+}
+
+// Autoplay muted, unmute on first click
+function onPlayerReady(event) {
+  event.target.playVideo();
+  event.target.mute(); // start muted
+
+  function unmuteOnFirstClick() {
+    event.target.unMute();
+    event.target.setVolume(100);
+    document.body.removeEventListener("click", unmuteOnFirstClick);
+  }
+  document.body.addEventListener("click", unmuteOnFirstClick, { once: true });
+}
+
 
 function startSlideshow() {
   document.querySelectorAll('.slide').forEach(slide => {
@@ -666,31 +710,4 @@ document.getElementById("openModal").addEventListener("click", () => {
 </body>
 
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
