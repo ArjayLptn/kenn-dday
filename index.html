@@ -521,8 +521,14 @@ function unlock() {
       // Show the YouTube video container after unlock
       // Show the container by fading it in
       const videoContainer = document.getElementById("bdayVideoContainer");
+      videoContainer.style.display = "block";  // make it occupy space
+      videoContainer.style.opacity = "0";      // start invisible
       videoContainer.style.transition = "opacity 0.6s";
-      videoContainer.style.opacity = "1";  // fade in
+
+// fade in
+setTimeout(() => {
+  videoContainer.style.opacity = "1";
+}, 10);
 
 
 
@@ -660,6 +666,7 @@ document.getElementById("openModal").addEventListener("click", () => {
 </body>
 
 </html>
+
 
 
 
