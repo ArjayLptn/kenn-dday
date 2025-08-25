@@ -513,12 +513,10 @@ function unlock() {
       content.style.display = "block";
       setTimeout(() => { content.style.opacity = "1"; }, 100);
 
-      // Show YouTube iframe after unlock
-      const video = document.getElementById("bdayVideo");
-      video.style.display = "block";  // show the video
-      video.loop = true;               // ensure it loops
-      video.muted = false;             // unmute if you want sound
-      video.play().catch(err => console.log("Video play blocked:", err));
+      // Show the YouTube video container after unlock
+      const videoContainer = document.getElementById("bdayVideoContainer");
+      videoContainer.style.display = "block"; // show the container
+
 
 
 
@@ -655,6 +653,7 @@ document.getElementById("openModal").addEventListener("click", () => {
 </body>
 
 </html>
+
 
 
 
