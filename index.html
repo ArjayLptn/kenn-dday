@@ -518,20 +518,32 @@ function unlock() {
       content.style.display = "block";
       setTimeout(() => { content.style.opacity = "1"; }, 100);
 
-      // Show the YouTube video container after unlock
-      // Show the container by fading it in
-      const videoContainer = document.getElementById("bdayVideoContainer");
-      videoContainer.style.display = "block";  // make it occupy space
-      videoContainer.style.opacity = "0";      // start invisible
+     const videoContainer = document.getElementById("bdayVideoContainer");
+
+      // Make it occupy space but start invisible
+      videoContainer.style.display = "block";
+      videoContainer.style.opacity = "0";
       videoContainer.style.transition = "opacity 0.6s";
-
-// fade in
-setTimeout(() => {
-  videoContainer.style.opacity = "1";
-}, 10);
-
-
-
+      
+      // Fade it in slightly after unlocking
+      setTimeout(() => {
+        videoContainer.style.opacity = "1";
+      }, 100);
+      
+      // Reference to the iframe
+      const video = document.getElementById("bdayVideo");
+      
+      // Ensure autoplay muted (required for mobile autoplay)
+      video.muted = true;
+      video.play().catch(err => console.log("Video play blocked:", err));
+      
+      // Add tap-to-unmute (first user interaction)
+      function unmuteOnTap() {
+        video.muted = false;
+        video.volume = 1;
+        document.body.removeEventListener("click", unmuteOnTap);
+      }
+      document.body.addEventListener("click", unmuteOnTap, { once: true });
 
 
       startSlideshow();
@@ -666,6 +678,7 @@ document.getElementById("openModal").addEventListener("click", () => {
 </body>
 
 </html>
+
 
 
 
