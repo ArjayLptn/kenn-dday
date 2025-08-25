@@ -456,13 +456,11 @@ video {
 
 
 <!-- Video -->
-    <div id="bdayVideoContainer" margin:20px auto; max-width:1144px;">
-<iframe id="bdayVideo" width="1144" height="480"
-  src="https://www.youtube.com/embed/-pz8RfOWS18?autoplay=1&loop=1&playlist=-pz8RfOWS18&controls=1"
-  frameborder="0" allow="autoplay; encrypted-media" allowfullscreen
-  style="display:none;">
-</iframe>
-
+   <div id="bdayVideoContainer" style="opacity:0; margin:20px auto; max-width:1144px;">
+  <iframe id="bdayVideo" width="1144" height="480"
+    src="https://www.youtube.com/embed/-pz8RfOWS18?autoplay=1&loop=1&playlist=-pz8RfOWS18&controls=1"
+    frameborder="0" allow="autoplay; encrypted-media" allowfullscreen>
+  </iframe>
 </div>
   
 
@@ -515,8 +513,10 @@ function unlock() {
       setTimeout(() => { content.style.opacity = "1"; }, 100);
 
       // Show the YouTube video container after unlock
+      // Show the container by fading it in
       const videoContainer = document.getElementById("bdayVideoContainer");
-      videoContainer.style.display = "block"; // show the container
+      videoContainer.style.transition = "opacity 0.6s";
+      videoContainer.style.opacity = "1";  // fade in
 
 
 
@@ -654,6 +654,7 @@ document.getElementById("openModal").addEventListener("click", () => {
 </body>
 
 </html>
+
 
 
 
