@@ -514,8 +514,9 @@ function unlock() {
       setTimeout(() => { content.style.opacity = "1"; }, 100);
 
       // Show YouTube iframe after unlock
-      const yt = document.getElementById("ytVideo");
-      yt.style.display = "block";  // only show after unlock
+      const video = document.getElementById("bdayVideo");
+      video.style.display = "block"; // only show after unlock
+      video.play();
 
 
 
@@ -651,6 +652,7 @@ document.getElementById("openModal").addEventListener("click", () => {
 </body>
 
 </html>
+
 
 
 
