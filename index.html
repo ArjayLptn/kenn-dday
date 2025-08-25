@@ -455,19 +455,18 @@ video {
 </div>
 
 
-<!-- Video -->
+<!-- Video 
 <div id="bdayVideoContainer" style="display:none; max-width: 100%; margin: 20px auto;">
   <div style="position: relative; width: 100%; padding-bottom: 56.25%;">
     <iframe id="bdayVideo"
-      src="https://www.youtube.com/embed/-pz8RfOWS18?autoplay=1&loop=1&playlist=-pz8RfOWS18&controls=0&modestbranding=1&disablekb=1&rel=0"
-      frameborder="0"
-      allow="autoplay; encrypted-media"
-      allowfullscreen
-      style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;">
-    </iframe>
+  src="https://www.youtube.com/embed/-pz8RfOWS18?autoplay=1&loop=1&playlist=-pz8RfOWS18&mute=1&controls=0"
+  frameborder="0" allow="autoplay; encrypted-media" allowfullscreen>
+</iframe>
   </div>
+</div>-->
+<div id="bdayVideoContainer" style="display:none; margin:20px auto; max-width:1144px;">
+  <div id="bdayVideo"></div> <!-- YouTube API will create iframe -->
 </div>
-
   
 
 <!-- Modal structure -->
@@ -490,6 +489,45 @@ video {
 </div>
 
 <script>
+  // Load YouTube Iframe API
+  const tag = document.createElement('script');
+  tag.src = "https://www.youtube.com/iframe_api";
+  document.body.appendChild(tag);
+
+  let player;
+
+  function onYouTubeIframeAPIReady() {
+    player = new YT.Player('bdayVideo', {
+      height: '480',
+      width: '1144',
+      videoId: '-pz8RfOWS18',
+      playerVars: {
+        autoplay: 1,
+        loop: 1,
+        playlist: '-pz8RfOWS18',
+        controls: 0,
+        mute: 1,          // start muted for mobile autoplay
+        modestbranding: 1,
+        rel: 0
+      },
+      events: {
+        'onReady': onPlayerReady
+      }
+    });
+  }
+
+  function onPlayerReady(event) {
+    event.target.playVideo(); // autoplay muted
+  }
+
+  // Tap anywhere to unmute
+  document.body.addEventListener("click", () => {
+    if (player) {
+      player.unMute();
+      player.setVolume(100);
+    }
+  }, { once: true });
+  
 document.body.classList.add("locked");
 
 function checkPassword() {
@@ -518,37 +556,17 @@ function unlock() {
   const lockScreen = document.getElementById("lockScreen");
   const content = document.getElementById("content");
   const videoContainer = document.getElementById("bdayVideoContainer");
-  const video = document.getElementById("bdayVideo");
+  
 
   // Fade out lock screen
   lockScreen.style.transition = "opacity 0.6s";
   lockScreen.style.opacity = "0";
 
-  setTimeout(() => {
-    lockScreen.style.display = "none";
-    content.style.display = "block";
 
-    // Fade in content
-    setTimeout(() => { content.style.opacity = "1"; }, 100);
-
-    // Show video container and fade in
-    videoContainer.style.display = "block";
-    videoContainer.style.opacity = "0";
-    videoContainer.style.transition = "opacity 0.6s";
-
-    setTimeout(() => { videoContainer.style.opacity = "1"; }, 100);
-
-    // Autoplay muted (required for mobile autoplay)
-    video.muted = true;
-    video.play().catch(err => console.log("Video play blocked:", err));
-
-    // Tap anywhere to unmute (works on mobile and desktop)
-    function unmuteOnTap() {
-      video.muted = false;
-      video.volume = 1;
-      document.body.removeEventListener("click", unmuteOnTap);
-    }
-    document.body.addEventListener("click", unmuteOnTap, { once: true });
+  videoContainer.style.display = "block";
+  videoContainer.style.opacity = "0";
+  videoContainer.style.transition = "opacity 0.6s";
+  setTimeout(() => { videoContainer.style.opacity = "1"; }, 100);
 
 
       startSlideshow();
@@ -683,6 +701,7 @@ document.getElementById("openModal").addEventListener("click", () => {
 </body>
 
 </html>
+
 
 
 
