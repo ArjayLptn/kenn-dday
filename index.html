@@ -456,14 +456,10 @@ video {
 
 
 <!-- Video -->
-<div id="bdayVideoContainer" style="display:none; max-width: 100%; margin: 20px auto;">
-  <div style="position: relative; width: 100%; padding-bottom: 56.25%;">
-    <iframe id="bdayVideo"
-  src="https://www.youtube.com/embed/-pz8RfOWS18?autoplay=1&loop=1&playlist=-pz8RfOWS18&mute=1&controls=0"
-  frameborder="0" allow="autoplay; encrypted-media" allowfullscreen>
-</iframe>
-  </div>
+<div id="bdayVideoContainer" style="display:none; width: 100%; display: flex; justify-content: center; align-items: center; margin: 20px 0;">
+  <div id="player" style="max-width: 640px; width: 100%;"></div>
 </div>
+
 
 
   
@@ -707,5 +703,6 @@ document.getElementById("openModal").addEventListener("click", () => {
 </body>
 
 </html>
+
 
 
