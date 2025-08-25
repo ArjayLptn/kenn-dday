@@ -544,7 +544,6 @@ function checkPassword() {
 function unlock() {
   const pass = document.getElementById("passwordInput").value;
   
-  // password obfuscated
   const hidden = [56,49,54,49,57,57,55]; 
   const realPass = "0" + hidden.map(c => String.fromCharCode(c)).join("");
 
@@ -556,7 +555,6 @@ function unlock() {
   const lockScreen = document.getElementById("lockScreen");
   const content = document.getElementById("content");
   const videoContainer = document.getElementById("bdayVideoContainer");
-  const video = document.getElementById("bdayVideo");
 
   // fade out lock screen
   lockScreen.style.transition = "opacity 0.6s";
@@ -575,44 +573,23 @@ function unlock() {
     videoContainer.style.transition = "opacity 0.6s";
     setTimeout(() => videoContainer.style.opacity = "1", 50);
 
-    // autoplay muted first
-    video.muted = true;
-    video.play().catch(err => console.log("Autoplay blocked:", err));
+    // Autoplay muted is handled by the YouTube API
+    if (player) {
+      player.mute();
+      player.playVideo();
+    }
 
-    // Tap anywhere to unmute once (works on mobile)
+    // Tap anywhere to unmute once
     function unmuteOnTap() {
-      video.muted = false;
-      video.volume = 1;
+      if (player) {
+        player.unMute();
+        player.setVolume(100);
+      }
       document.body.removeEventListener("click", unmuteOnTap);
     }
     document.body.addEventListener("click", unmuteOnTap, { once: true });
+
   }, 600);
-}
-
-      startSlideshow();
-
-      // 🎉 Confetti burst (moved here)
-      confetti({
-        particleCount: 150,
-        spread: 100,
-        origin: { y: 0.6 }
-      });
-
-      // 🎈 Balloons (moved here)
-      for (let i = 0; i < 6; i++) {
-        let balloon = document.createElement("div");
-        balloon.className = "balloon";
-        document.body.appendChild(balloon);
-
-        balloon.style.left = Math.random() * 100 + "vw";
-        balloon.style.animationDelay = Math.random() * 2 + "s";
-
-        setTimeout(() => balloon.remove(), 6000);
-      }
-    }, 600);
-  } else {
-    document.getElementById("error").style.display = "block";
-  }
 }
 
 function startSlideshow() {
@@ -721,6 +698,7 @@ document.getElementById("openModal").addEventListener("click", () => {
 </body>
 
 </html>
+
 
 
 
