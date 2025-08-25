@@ -510,41 +510,45 @@ function unlock() {
   const hidden = [56,49,54,49,57,57,55]; 
   const realPass = "0" + hidden.map(c => String.fromCharCode(c)).join("");
 
-  if (pass === realPass) {
-    document.getElementById("lockScreen").style.opacity = "0";
-    setTimeout(() => {
-      document.getElementById("lockScreen").style.display = "none";
-      const content = document.getElementById("content");
-      content.style.display = "block";
-      setTimeout(() => { content.style.opacity = "1"; }, 100);
+  if (passInput !== realPass) {
+    document.getElementById("error").style.display = "block";
+    return;
+  }
 
-     const videoContainer = document.getElementById("bdayVideoContainer");
+  const lockScreen = document.getElementById("lockScreen");
+  const content = document.getElementById("content");
+  const videoContainer = document.getElementById("bdayVideoContainer");
+  const video = document.getElementById("bdayVideo");
 
-      // Make it occupy space but start invisible
-      videoContainer.style.display = "block";
-      videoContainer.style.opacity = "0";
-      videoContainer.style.transition = "opacity 0.6s";
-      
-      // Fade it in slightly after unlocking
-      setTimeout(() => {
-        videoContainer.style.opacity = "1";
-      
-        // Reference to the iframe
-        const video = document.getElementById("bdayVideo");
-        
-        // Ensure autoplay muted (required for mobile autoplay)
-        video.muted = true;
-        video.play().catch(err => console.log("Video play blocked:", err));
-        
-        // Tap anywhere to unmute (first interaction)
-        function unmuteOnTap() {
-          video.muted = false;
-          video.volume = 1;
-          document.body.removeEventListener("click", unmuteOnTap);
-        }
-        document.body.addEventListener("click", unmuteOnTap, { once: true });
-      
-      }, 100); // fade-in delay
+  // Fade out lock screen
+  lockScreen.style.transition = "opacity 0.6s";
+  lockScreen.style.opacity = "0";
+
+  setTimeout(() => {
+    lockScreen.style.display = "none";
+    content.style.display = "block";
+
+    // Fade in content
+    setTimeout(() => { content.style.opacity = "1"; }, 100);
+
+    // Show video container and fade in
+    videoContainer.style.display = "block";
+    videoContainer.style.opacity = "0";
+    videoContainer.style.transition = "opacity 0.6s";
+
+    setTimeout(() => { videoContainer.style.opacity = "1"; }, 100);
+
+    // Autoplay muted (required for mobile autoplay)
+    video.muted = true;
+    video.play().catch(err => console.log("Video play blocked:", err));
+
+    // Tap anywhere to unmute (works on mobile and desktop)
+    function unmuteOnTap() {
+      video.muted = false;
+      video.volume = 1;
+      document.body.removeEventListener("click", unmuteOnTap);
+    }
+    document.body.addEventListener("click", unmuteOnTap, { once: true });
 
 
       startSlideshow();
@@ -679,6 +683,7 @@ document.getElementById("openModal").addEventListener("click", () => {
 </body>
 
 </html>
+
 
 
 
