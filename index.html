@@ -456,12 +456,18 @@ video {
 
 
 <!-- Video -->
-   <div id="bdayVideoContainer" style="opacity:0; margin:20px auto; max-width:1144px;">
-  <iframe id="bdayVideo" width="840" height="480"
-    src="https://www.youtube.com/embed/-pz8RfOWS18?autoplay=1&loop=1&playlist=-pz8RfOWS18&controls=0"
-    frameborder="0" allow="autoplay; encrypted-media" allowfullscreen>
-  </iframe>
+<div id="bdayVideoContainer" style="display:none; max-width: 100%; margin: 20px auto;">
+  <div style="position: relative; width: 100%; padding-bottom: 56.25%;">
+    <iframe id="bdayVideo"
+      src="https://www.youtube.com/embed/-pz8RfOWS18?autoplay=1&loop=1&playlist=-pz8RfOWS18&controls=0&modestbranding=1&disablekb=1&rel=0"
+      frameborder="0"
+      allow="autoplay; encrypted-media"
+      allowfullscreen
+      style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;">
+    </iframe>
+  </div>
 </div>
+
   
 
 <!-- Modal structure -->
@@ -654,6 +660,7 @@ document.getElementById("openModal").addEventListener("click", () => {
 </body>
 
 </html>
+
 
 
 
