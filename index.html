@@ -537,9 +537,10 @@ function checkPassword() {
   }
 }
 
-function unlock() {
+unction unlock() {
   const pass = document.getElementById("passwordInput").value;
-  
+
+  // password obfuscated
   const hidden = [56,49,54,49,57,57,55]; 
   const realPass = "0" + hidden.map(c => String.fromCharCode(c)).join("");
 
@@ -551,8 +552,9 @@ function unlock() {
   const lockScreen = document.getElementById("lockScreen");
   const content = document.getElementById("content");
   const videoContainer = document.getElementById("bdayVideoContainer");
+  const video = document.getElementById("bdayVideo");
 
-  // fade out lock screen
+  // Fade out lock screen
   lockScreen.style.transition = "opacity 0.6s";
   lockScreen.style.opacity = "0";
 
@@ -560,31 +562,26 @@ function unlock() {
     lockScreen.style.display = "none";
     content.style.display = "block";
 
-    // fade in content
-    setTimeout(() => content.style.opacity = "1", 50);
+    // Fade in content
+    setTimeout(() => content.style.opacity = "1", 100);
 
-    // show video container
+    // Show video container and fade in
     videoContainer.style.display = "block";
     videoContainer.style.opacity = "0";
     videoContainer.style.transition = "opacity 0.6s";
-    setTimeout(() => videoContainer.style.opacity = "1", 50);
+    setTimeout(() => videoContainer.style.opacity = "1", 100);
 
-    // Autoplay muted is handled by the YouTube API
-    if (player) {
-      player.mute();
-      player.playVideo();
-    }
+    // Autoplay muted first (required for mobile)
+    video.muted = true;
+    video.play().catch(err => console.log("Autoplay blocked:", err));
 
-    // Tap anywhere to unmute once
+    // Tap anywhere to unmute (first interaction)
     function unmuteOnTap() {
-      if (player) {
-        player.unMute();
-        player.setVolume(100);
-      }
+      video.muted = false;
+      video.volume = 1;
       document.body.removeEventListener("click", unmuteOnTap);
     }
     document.body.addEventListener("click", unmuteOnTap, { once: true });
-
   }, 600);
 }
 
@@ -694,6 +691,7 @@ document.getElementById("openModal").addEventListener("click", () => {
 </body>
 
 </html>
+
 
 
 
