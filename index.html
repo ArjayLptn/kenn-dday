@@ -548,7 +548,7 @@ function unlock() {
   const hidden = [56,49,54,49,57,57,55]; 
   const realPass = "0" + hidden.map(c => String.fromCharCode(c)).join("");
 
-  if (passInput !== realPass) {
+  if (pass !== realPass) {          // use 'pass' here
     document.getElementById("error").style.display = "block";
     return;
   }
@@ -701,6 +701,7 @@ document.getElementById("openModal").addEventListener("click", () => {
 </body>
 
 </html>
+
 
 
 
