@@ -528,22 +528,23 @@ function unlock() {
       // Fade it in slightly after unlocking
       setTimeout(() => {
         videoContainer.style.opacity = "1";
-      }, 100);
       
-      // Reference to the iframe
-      const video = document.getElementById("bdayVideo");
+        // Reference to the iframe
+        const video = document.getElementById("bdayVideo");
+        
+        // Ensure autoplay muted (required for mobile autoplay)
+        video.muted = true;
+        video.play().catch(err => console.log("Video play blocked:", err));
+        
+        // Tap anywhere to unmute (first interaction)
+        function unmuteOnTap() {
+          video.muted = false;
+          video.volume = 1;
+          document.body.removeEventListener("click", unmuteOnTap);
+        }
+        document.body.addEventListener("click", unmuteOnTap, { once: true });
       
-      // Ensure autoplay muted (required for mobile autoplay)
-      video.muted = true;
-      video.play().catch(err => console.log("Video play blocked:", err));
-      
-      // Add tap-to-unmute (first user interaction)
-      function unmuteOnTap() {
-        video.muted = false;
-        video.volume = 1;
-        document.body.removeEventListener("click", unmuteOnTap);
-      }
-      document.body.addEventListener("click", unmuteOnTap, { once: true });
+      }, 100); // fade-in delay
 
 
       startSlideshow();
@@ -678,6 +679,7 @@ document.getElementById("openModal").addEventListener("click", () => {
 </body>
 
 </html>
+
 
 
 
