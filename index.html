@@ -32,13 +32,15 @@ body::before {
   pointer-events: none;       /*ensures no click blocking */
 }
 #lockScreen {
-  position: relative;
-  height: 100vh; /* full screen height */
+  position: fixed; /* stay above content */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;  /* higher than any video */
   display: flex;
-  flex-direction: column;
-  justify-content: center; /* centers inputs vertically */
+  justify-content: center;
   align-items: center;
-  text-align: center;
 }
 
 /* Make lockbox responsive */
@@ -648,6 +650,7 @@ document.getElementById("openModal").addEventListener("click", () => {
 </body>
 
 </html>
+
 
 
 
