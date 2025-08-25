@@ -453,20 +453,23 @@ video {
    <!-- Slideshow -->
 <div class="slideshow">
   <div class="slide">
-    <img src="506435540_2420174051685592_4757265308772669572_n.jpg" class="active">
-    <img src="494625851_2382943575408640_5228932212260114853_n.jpg">
-    <img src="481289664_2330183864017945_938278296577919621_n.jpg">
-    <img src="473896177_2295040024198996_251147303708377755_n.jpg">
-    <img src="485770004_2345937762442555_4009250750285579272_n.jpg">
-    <img src="486244450_2345937492442582_6231987000543063133_n.jpg">
-    <img src="483798591_2340648759638122_6619314264299853109_n.jpg">
-    <img src="480702441_2319561321746866_837965574855685271_n.jpg">
-    <img src="473831047_2296532787383053_6335252790635403600_n.jpg">
-    <img src="485894931_2346632912373040_6470507713046637265_n.jpg">
-    <img src="PSX_20250825_030516.jpg">
-    <img src="PSX_20250825_025933.jpg">
+    <img src="506435540_2420174051685592_4757265308772669572_n.jpg" class="active" data-msg="Pogi POgi oums😚">
+    <img src="494625851_2382943575408640_5228932212260114853_n.jpg" data-msg="Sino nman ksama mo dyan?!😤">
+    <img src="481289664_2330183864017945_938278296577919621_n.jpg" data-msg="Da't sa'ken lang tingin neto😩">
+    <img src="473896177_2295040024198996_251147303708377755_n.jpg" data-msg="Kyott kyott nman nan🥹">
+    <img src="485770004_2345937762442555_4009250750285579272_n.jpg" data-msg="Tubig po tawag dyann heheh😛">
+    <img src="486244450_2345937492442582_6231987000543063133_n.jpg" data-msg="Bawal holding hands nsa labas tayo👉👈">
+    <img src="483798591_2340648759638122_6619314264299853109_n.jpg" data-msg="Matutunaw ako nan ihh😳">
+    <img src="480702441_2319561321746866_837965574855685271_n.jpg" data-msg="'Nu ginagawa mo dito? jk AHAHHAH">
+    <img src="473831047_2296532787383053_6335252790635403600_n.jpg" data-msg="Eto talaga kyuttie mo dyan🥹🥰 ">
+    <img src="485894931_2346632912373040_6470507713046637265_n.jpg" data-msg="Sabing sa'ken mo lang da't isend 'yan🤤">
+    <img src="PSX_20250825_030516.jpg" data-msg="'Yang ngiting 'yan kahinaan ko ayyts🥹">
+    <img src="PSX_20250825_025933.jpg" data-msg="LAHHHh PARANG TNGAA EHHEUWUE😳🥰">
   </div>
 </div>
+
+<!-- Message below slideshow -->
+<div id="slideMessage" style="color:white; text-align:center; margin-top:10px; font-size:1.1em;"></div>
 </div>
 <br>
 <!-- Message -->
@@ -593,11 +596,19 @@ function startSlideshow() {
   document.querySelectorAll('.slide').forEach(slide => {
     const imgs = slide.querySelectorAll('img');
     let i = 0;
+    const messageDiv = document.getElementById("slideMessage");
+
+    // Set initial message
+    messageDiv.innerText = imgs[i].dataset.msg || "";
+
     setInterval(() => {
       imgs[i].classList.remove('active');
       i = (i + 1) % imgs.length;
       imgs[i].classList.add('active');
-    }, 5000); // 5s per change
+
+      // Update message for current image
+      messageDiv.innerText = imgs[i].dataset.msg || "";
+    }, 7000); // 7 seconds per image
   });
 }
 
@@ -695,6 +706,7 @@ document.getElementById("openModal").addEventListener("click", () => {
 </body>
 
 </html>
+
 
 
 
