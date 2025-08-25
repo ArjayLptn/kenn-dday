@@ -538,6 +538,9 @@ function unlock() {
     content.style.display = "block";
     setTimeout(() => content.style.opacity = "1", 100);
 
+    // START SLIDESHOW HERE
+    startSlideshow();
+
     // show video container
     videoContainer.style.display = "block";
     videoContainer.style.opacity = "0";
@@ -572,6 +575,7 @@ function unlock() {
     }
   }, 600);
 }
+
 // Show unmute overlay
 const overlay = document.getElementById("unmuteOverlay");
 overlay.style.display = "block";
@@ -584,6 +588,7 @@ overlay.addEventListener("click", () => {
   overlay.style.display = "none"; // remove overlay after click
 });
 
+// SLIDESHOW FUNCTION
 function startSlideshow() {
   document.querySelectorAll('.slide').forEach(slide => {
     const imgs = slide.querySelectorAll('img');
@@ -592,7 +597,7 @@ function startSlideshow() {
       imgs[i].classList.remove('active');
       i = (i + 1) % imgs.length;
       imgs[i].classList.add('active');
-    }, 5000); // 6s per change
+    }, 5000); // 5s per change
   });
 }
 
@@ -690,6 +695,7 @@ document.getElementById("openModal").addEventListener("click", () => {
 </body>
 
 </html>
+
 
 
 
