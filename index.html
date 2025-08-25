@@ -486,38 +486,6 @@ video {
 <script>
 let player;
 
-function onYouTubeIframeAPIReady() {
-  player = new YT.Player('player', {
-    height: '360',
-    width: '640',
-    videoId: '-pz8RfOWS18',
-    playerVars: {
-      autoplay: 1,
-      controls: 0,
-      loop: 1,
-      playlist: '-pz8RfOWS18',
-      modestbranding: 1
-    },
-    events: {
-      onReady: onPlayerReady
-    }
-  });
-}
-
-function onPlayerReady(event) {
-  event.target.playVideo();
-  event.target.mute(); // start muted for autoplay compliance
-
-  // Unmute on first click anywhere
-  function unmuteOnTap() {
-    event.target.unMute();
-    event.target.setVolume(100);
-    document.body.removeEventListener("click", unmuteOnTap);
-  }
-  document.body.addEventListener("click", unmuteOnTap, { once: true });
-}
-
-// Your unlock function
 function unlock() {
   const pass = document.getElementById("passwordInput").value;
 
@@ -534,66 +502,48 @@ function unlock() {
   const content = document.getElementById("content");
   const videoContainer = document.getElementById("bdayVideoContainer");
 
-  // Fade out lock screen
+  // fade out lock screen
   lockScreen.style.transition = "opacity 0.6s";
   lockScreen.style.opacity = "0";
 
   setTimeout(() => {
     lockScreen.style.display = "none";
     content.style.display = "block";
-
-    // Fade in content
     setTimeout(() => content.style.opacity = "1", 100);
 
-    // Show video container with fade
+    // show video container
     videoContainer.style.display = "block";
     videoContainer.style.opacity = "0";
     videoContainer.style.transition = "opacity 0.6s";
     setTimeout(() => videoContainer.style.opacity = "1", 100);
 
-    // Start YouTube video after unlock
-    if (typeof YT !== "undefined" && YT.Player) {
-      startYTVideo();
+    // create YouTube player AFTER unlock
+    if (!player && typeof YT !== "undefined" && YT.Player) {
+      player = new YT.Player('player', {
+        height: '360',
+        width: '640',
+        videoId: '-pz8RfOWS18',
+        playerVars: {
+          autoplay: 1,
+          controls: 0,
+          loop: 1,
+          playlist: '-pz8RfOWS18',
+          modestbranding: 1,
+          mute: 1
+        },
+        events: {
+          onReady: function(event) {
+            event.target.playVideo();
+            event.target.mute();
+            document.body.addEventListener("click", () => {
+              event.target.unMute();
+              event.target.setVolume(100);
+            }, { once: true });
+          }
+        }
+      });
     }
   }, 600);
-}
-
-// YouTube player setup
-let player;
-function startYTVideo() {
-  if (!player) {
-    player = new YT.Player('player', {
-      height: '360',
-      width: '640',
-      videoId: '-pz8RfOWS18',
-      playerVars: {
-        autoplay: 1,
-        controls: 0,
-        loop: 1,
-        playlist: '-pz8RfOWS18',
-        modestbranding: 1,
-        mute: 1
-      },
-      events: {
-        onReady: onPlayerReady
-      }
-    });
-  } else {
-    player.playVideo();
-  }
-}
-
-// Autoplay muted, unmute on first click
-function onPlayerReady(event) {
-  event.target.playVideo();
-  event.target.mute(); // start muted
-
-  function unmuteOnFirstClick() {
-    event.target.unMute();
-    event.target.setVolume(100);
-    document.body.removeEventListener("click", unmuteOnFirstClick);
-  }
-  document.body.addEventListener("click", unmuteOnFirstClick, { once: true });
 }
 
 
@@ -703,6 +653,7 @@ document.getElementById("openModal").addEventListener("click", () => {
 </body>
 
 </html>
+
 
 
 
