@@ -5,7 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kinich DDay</title>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<!-- Load EmailJS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>
+    (function(){
+      emailjs.init({
+        publicKey: "Zx9-D3UpeuKtbTWnE"
+      });
+    })();
 
+    function sendNotif() {
+      emailjs.send("service_whkba0g", "template_gj5iu3p", {
+        to_name: "Budds",
+        message: "The message has been opened!"
+      })
+      .then((res) => console.log("SUCCESS!", res))
+      .catch((err) => console.log("FAILED...", err));
+    }
+  </script>
 <style>
 body.locked {
   overflow: ;   /*disable scrolling*/
@@ -792,6 +809,7 @@ document.getElementById("totgaTab").addEventListener("click", () => {
 </body>
 
 </html>
+
 
 
 
